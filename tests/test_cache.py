@@ -4,6 +4,7 @@ import pytest
 
 from cache.cache_manager import CacheManager
 from cache.disk_cache import DiskCache
+from cache.maintenance import warmup
 from cache.distributed_cache import DistributedCache
 from cache.memory_cache import MemoryCache
 from cache.redis_cache import RedisCache
@@ -68,3 +69,13 @@ def test_distributed_cache_plugs_in_without_manager_changes() -> None:
 def test_none_is_rejected() -> None:
     with pytest.raises(ValueError):
         MemoryCache().set("a", None)
+
+
+def test_warmup_fills_every_level(tmp_path: Path) -> None:
+    memory = MemoryCache()
+    disk = DiskCache(str(tmp_path / "cache.json"))
+    manager = CacheManager([memory, disk])
+    stored = warmup(manager, {"city": "Казань", "lang": "ru"})
+    assert stored == 2
+    assert memory.get("city") == "Казань"
+    assert disk.get("lang") == "ru"
