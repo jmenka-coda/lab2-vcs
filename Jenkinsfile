@@ -31,7 +31,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Запуск тестов...'
-                sh 'pip install pytest && pytest || true'
+                sh 'pip install pytest && python -m pytest || true'
             }
         }
 
