@@ -10,3 +10,9 @@ Eugen
 CacheManager зависит только от абстракции ICache.
 Реализации: MemoryCache, DiskCache, RedisCache.
 Четвёртый узел DistributedCache подключается снаружи и не меняет CacheManager.
+
+## Установка
+
+```
+pip install -r requirements.txt
+```
