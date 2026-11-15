@@ -5,6 +5,7 @@ from cache.disk_cache import DiskCache
 from cache.distributed_cache import DistributedCache
 from cache.memory_cache import MemoryCache
 from cache.redis_cache import RedisCache
+from logger import log
 
 
 def main() -> None:
@@ -14,17 +15,17 @@ def main() -> None:
 
     manager = CacheManager([memory, disk, redis])
     manager.set("user:1", "Анна")
-    print("сквозное чтение:", manager.get("user:1"))
+    log("info", "сквозное чтение: " + str(manager.get("user:1")))
 
     # Промах в первом уровне, попадание во втором.
     cold_memory = MemoryCache()
     warm_disk = DiskCache("data/disk_only.json")
     warm_disk.set("order:5", "cached-on-disk")
     cascade = CacheManager([cold_memory, warm_disk])
-    print("каскад:", cascade.get("order:5"))
-    print("после подъёма в память:", cold_memory.get("order:5"))
+    log("info", "каскад: " + str(cascade.get("order:5")))
+    log("info", "после подъёма в память: " + str(cold_memory.get("order:5")))
 
-    print("--- Добавляем DistributedCache без изменения CacheManager ---")
+    log("info", "Добавляем DistributedCache без изменения CacheManager")
     extended = CacheManager(
         [
             MemoryCache(),
@@ -34,7 +35,7 @@ def main() -> None:
         ]
     )
     extended.set("session", "abc")
-    print("четыре уровня:", extended.get("session"))
+    log("info", "четыре уровня: " + str(extended.get("session")))
 
 
 if __name__ == "__main__":
